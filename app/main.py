@@ -4,7 +4,7 @@ from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from .cache import lookup
 
-class ManyRequest(BaseModel):
+class SetCache(BaseModel):
     key: str
     values: dict
 
