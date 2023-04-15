@@ -35,7 +35,7 @@ def get_cache(key):
 
 @app.post("/cache",status_code=status.HTTP_201_CREATED)
 #def post_cache(payload: dict = Body(...)):
-def set_cache(body: ManyRequest):
+def set_cache(body: SetCache):
     key = body.key
     response = lookup.lookup.set(key,body.values)
     
