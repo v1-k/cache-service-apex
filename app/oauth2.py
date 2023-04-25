@@ -1,13 +1,12 @@
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from . import schemas, database
-from fastapi import Depends, status, HTTPException
+from fastapi import Depends, status, HTTPException, Header
 from fastapi.security import OAuth2PasswordBearer
 
 from .config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
-
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
@@ -67,6 +66,24 @@ def get_user( id):
                 row = cursor.fetchone()
                 if row:
                     return row
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials{e}")    
+    
+def verify_secret_key(api_key: str = Header(None)):
+    if api_key is None :
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials, api-key not found")
+    
+    pool = database.db.get()
+    sql = "select CACHE_USER_ID from CACHE_SECRET_KEYS where KEY = :KEY"
+    try:
+        with pool.acquire() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(sql, [api_key])
+                row = cursor.fetchone()
+                if not row:
+                    raise Exception("")
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials{e}")    
