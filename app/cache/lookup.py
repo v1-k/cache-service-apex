@@ -1,6 +1,4 @@
 from .lru import LRUCache
-
-import json
 from ..config import settings
 
 
@@ -25,4 +23,4 @@ class Lookup:
         return None
 
 
-lookup = Lookup(settings.lru_size, settings.ttl)
+lookup = Lookup(settings.lrusize, settings.ttl)

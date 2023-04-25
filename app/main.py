@@ -1,12 +1,6 @@
-from fastapi import FastAPI, status, HTTPException, Body
-from pydantic import BaseModel
-from typing import List
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .cache import lookup
-
-class SetCache(BaseModel):
-    key: str
-    values: dict
+from .routers import cache, user, auth
 
 app = FastAPI()
 
@@ -19,27 +13,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(cache.router)
+app.include_router(user.router)
+app.include_router(auth.router)
 
 @app.get("/")
 def root():
-    return {"message": "Cache Service Home"}
-
-@app.get("/cache/{key}")
-def get_cache(key):
-    response = lookup.lookup.get(key)
-    
-    if not response :
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Key {key} not found ")
-    return response
-
-@app.post("/cache",status_code=status.HTTP_201_CREATED)
-#def post_cache(payload: dict = Body(...)):
-def set_cache(body: SetCache):
-    key = body.key
-    response = lookup.lookup.set(key,body.values)
-    
-    if not response :
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Key {key} not found ")
-    return response
+    return {"message": "Welcome to Cache service"}
